@@ -4,7 +4,7 @@ const asyncHandler = require("express-async-handler");
 const sharp = require("sharp");
 
 const ApiError = require("../utils/apiError");
-const ProductModel = require("../models/productModel");
+const productModel = require("../models/productModel");
 const Factory = require("./handlersFactory");
 const { uploadMixOfImages } = require("../middlewares/uploadImageMiddleware");
 
@@ -52,21 +52,21 @@ exports.resizeProductImage = asyncHandler(async (req, res, next) => {
 // @desc get all products
 // @route GET /api/v1/products
 // @access public
-exports.getProducts = Factory.getAll(ProductModel, "Products");
+exports.getProducts = Factory.getAll(productModel, "Products");
 // @desc create products
 // @route POST /api/v1/products
 // @access private
-exports.createProduct = Factory.createOne(ProductModel);
+exports.createProduct = Factory.createOne(productModel);
 // @desc get specific product by id
 // @route GET /api/v1/products/:id
 // @access Public
-exports.getProduct = Factory.getOne(ProductModel);
+exports.getProduct = Factory.getOne(productModel, "reviews");
 // @desc update specific product
 // @route PUT /api/v1/products/:id
 // @access Private
 
-exports.updateProduct = Factory.updateOne(ProductModel);
+exports.updateProduct = Factory.updateOne(productModel);
 // @desc delete specific product
 // @route DELETE /api/v1/products/:id
 // @access Private
-exports.deleteProduct = Factory.deleteOne(ProductModel);
+exports.deleteProduct = Factory.deleteOne(productModel);

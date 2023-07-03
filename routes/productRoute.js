@@ -14,10 +14,12 @@ const {
   createProductValidator,
   deleteProductValidator,
 } = require("../utils/validators/productValidator");
+const reviewRoute = require("./reviewRoute");
 
 const router = express.Router();
 const authService = require("../services/authService");
 
+router.use("/:productId/reviews", reviewRoute);
 router
   .route("/")
   .get(getProducts)

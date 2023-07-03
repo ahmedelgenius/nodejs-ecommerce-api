@@ -33,11 +33,15 @@ exports.getAll = (Model, modelName = "") =>
       data: documents,
     });
   });
-exports.getOne = (Model) =>
+exports.getOne = (Model, populationOpt) =>
   asyncHandler(async (req, res, next) => {
     const { id } = req.params;
-
-    const document = await Model.findById(id);
+    // build query
+    let query = Model.findById(id);
+    if (populationOpt) {
+      query = query.populate(populationOpt);
+    }
+    const document = await query;
     if (!document) {
       return next(new ApiError(`this document is not found`, 404));
     }
@@ -53,6 +57,7 @@ exports.updateOne = (Model) =>
       // res.status(404).json({ message: "this category is not found" });
       return next(new ApiError(`this document is not found`, 404));
     }
+    document.save();
     res.status(200).json({ data: document });
   });
 
@@ -65,5 +70,6 @@ exports.deleteOne = (Model) =>
       // res.status(404).json({ message: "this product is not found" });
       return next(new ApiError(`this document is not found`, 404));
     }
+
     res.status(200).json({ message: "deleted success " });
   });

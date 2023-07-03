@@ -82,7 +82,11 @@ const productSchema = new mongoose.Schema(
       default: 0,
     },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+    toJSON: { virtuals: true }, // So `res.json()` and other `JSON.stringify()` functions include virtuals
+    toObject: { virtuals: true }, // So `console.log()` and other functions that use `toObject()` include virtuals
+  }
 );
 // mongoose query middleware
 productSchema.pre(/^find/, function (next) {
@@ -108,6 +112,12 @@ const setImageURL = (doc) => {
     doc.images = imagesList;
   }
 };
+
+productSchema.virtual("reviews", {
+  ref: "Review",
+  foreignField: "product",
+  localField: "_id",
+});
 productSchema.post("init", (doc) => {
   setImageURL(doc);
 });
@@ -115,6 +125,6 @@ productSchema.post("save", (doc) => {
   setImageURL(doc);
 });
 
-const ProductModel = mongoose.model("Product", productSchema);
+const productModel = mongoose.model("Product", productSchema);
 
-module.exports = ProductModel;
+module.exports = productModel;
