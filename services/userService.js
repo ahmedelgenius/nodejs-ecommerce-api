@@ -7,6 +7,7 @@ const { uploadSingleImage } = require("../middlewares/uploadImageMiddleware");
 
 const UserModel = require("../models/userModel");
 const Factory = require("./handlersFactory");
+const createToken = require("../utils/createToken");
 const ApiError = require("../utils/apiError");
 
 exports.uploadUserImage = uploadSingleImage("profileImg");
@@ -73,7 +74,10 @@ exports.ChangePassword = asyncHandler(async (req, res, next) => {
   const document = await UserModel.findByIdAndUpdate(
     req.params.id,
 
-    { password: await bcrypt.hash(req.body.password, 7) },
+    {
+      password: await bcrypt.hash(req.body.password, 7),
+      passwordChangedAt: Date.now(),
+    },
     {
       new: true,
     }
@@ -88,3 +92,72 @@ exports.ChangePassword = asyncHandler(async (req, res, next) => {
 // @route DELETE /api/v1/users/:id
 // @access Private
 exports.deleteUser = Factory.deleteOne(UserModel);
+
+// @desc get user data
+// @route GET /api/v1/users
+// @access protect
+exports.getLoggedUser = asyncHandler(async (req, res, next) => {
+  req.params.id = req.user._id;
+  console.log(req.params.id);
+  next();
+});
+
+// @desc update logged user password
+// @route PUT /api/v1/users
+// @access protect
+exports.updateLoggedUserPassword = asyncHandler(async (req, res, next) => {
+  const user = await UserModel.findByIdAndUpdate(
+    req.user._id,
+
+    {
+      password: await bcrypt.hash(req.body.password, 7),
+      passwordChangedAt: Date.now(),
+    },
+    {
+      new: true,
+    }
+  );
+  console.log(user);
+  const token = createToken(user._id);
+  console.log(user._id, token);
+  res.status(201).json({ Data: user, token });
+});
+
+// @desc update logged user data
+// @route PUT /api/v1/users/updateMyData
+// @access protect
+exports.updateLoggedUserData = asyncHandler(async (req, res, next) => {
+  const updatedUser = await UserModel.findByIdAndUpdate(
+    req.user._id,
+    {
+      name: req.body.name,
+      email: req.body.email,
+      phone: req.body.phone,
+    },
+    { new: true }
+  );
+
+  res.status(200).json({ data: updatedUser });
+});
+// @desc deactivate user
+// @route PUT /api/v1/users/deleteMe
+// @access protect
+exports.deleteMe = asyncHandler(async (req, res, next) => {
+  await UserModel.findByIdAndUpdate(req.user._id, { active: false });
+
+  res.status(200).json({ message: "deactivated successfully" });
+});
+
+// @desc activate user
+// @route PUT /api/v1/users/activateMe
+// @access protect
+exports.activateMe = asyncHandler(async (req, res, next) => {
+  const user = await UserModel.findOne({ email: req.body.email });
+  if (!user) {
+    return next(new ApiError("not found user"));
+  }
+  if (user) {
+    await UserModel.findByIdAndUpdate(user._id, { active: true });
+    res.status(200).json({ message: "activated successfully" });
+  }
+});
