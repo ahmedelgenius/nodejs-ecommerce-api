@@ -1,12 +1,21 @@
 const path = require("path");
 
 const express = require("express");
+const compression = require("compression");
+const cors = require("cors");
 
 const dotenv = require("dotenv");
 
 dotenv.config({ path: "config.env" });
 
 const app = express();
+
+//enable other domains access to your application
+app.use(cors());
+app.options("*", cors());
+
+// compression all response
+app.use(compression());
 
 // middleware
 app.use(express.json());
@@ -15,16 +24,6 @@ app.use(express.static(path.join(__dirname, "uploads")));
 
 const morgan = require("morgan");
 const dbConnection = require("./config/database");
-// const categoryRoute = require("./routes/categoryRoute");
-// const subCategoryRoute = require("./routes/subCategoryRoute");
-// const brandRoute = require("./routes/brandRoute");
-// const productRoute = require("./routes/productRoute");
-// const userRoute = require("./routes/userRoute");
-// const authRoute = require("./routes/authRoute");
-// const reviewRoute = require("./routes/reviewRoute");
-// const wishlistRoute = require("./routes/wishlistRoute");
-// const addressRoute = require("./routes/addressRoute");
-// const couponRoute = require("./routes/couponRoute");
 const ApiError = require("./utils/apiError");
 const globalError = require("./middlewares/errorMiddleware");
 const mountRoute = require("./routes");
@@ -39,16 +38,6 @@ if (process.env.NODE_ENV === "development") {
 
 // mount route
 mountRoute(app);
-// app.use("/api/v1/categories", categoryRoute);
-// app.use("/api/v1/subcategories", subCategoryRoute);
-// app.use("/api/v1/brands", brandRoute);
-// app.use("/api/v1/products", productRoute);
-// app.use("/api/v1/users", userRoute);
-// app.use("/api/v1/auth", authRoute);
-// app.use("/api/v1/reviews", reviewRoute);
-// app.use("/api/v1/wishlist", wishlistRoute);
-// app.use("/api/v1/addresses", addressRoute);
-// app.use("/api/v1/coupons", couponRoute);
 
 app.all("*", (req, res, next) => {
   next(new ApiError(`Can't find this route : ${req.originalUrl} `, 400));
