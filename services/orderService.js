@@ -202,19 +202,7 @@ exports.webhookCheckout = asyncHandler(async (req, res, next) => {
   let event;
 
   try {
-    const payload = {
-      id: "evt_test_webhook",
-      object: "event",
-    };
-
-    const payloadString = JSON.stringify(payload, null, 2);
-    const secret = "whsec_test_secret";
-
-    const header = stripe.webhooks.generateTestHeaderString({
-      payload: payloadString,
-      secret: webhookForTest,
-    });
-    event = stripe.webhooks.constructEvent(req.body, header, webhookForTest);
+    event = stripe.webhooks.constructEvent(req.body, sig, webhookForTest);
   } catch (err) {
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
