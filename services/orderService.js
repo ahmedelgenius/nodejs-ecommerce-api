@@ -7,6 +7,7 @@ const cartModel = require("../models/cartModel");
 const ApiError = require("../utils/apiError");
 const orderModel = require("../models/orderModel");
 const productModel = require("../models/productModel");
+const UserModel = require("../models/userModel");
 
 // @desc create cash order
 // @route GET /api/v1/orders/cartId
@@ -154,34 +155,42 @@ exports.checkoutSession = asyncHandler(async (req, res, next) => {
   res.status(200).json({ status: "success", session });
 });
 
-const apiKey = process.env.STRIPE_SECRET;
-const apiUrl = "https://api.stripe.com/v1/charges";
+const createCardOrder = async (session) => {
+  const cartId = session.client_reference_id;
+  const shippingAddress = session.metadata;
+  const oderPrice = session.amount_total / 100;
 
-const requestData = {
-  amount: 1000,
-  currency: "egp",
-  source: "tok_visa",
-  description: "Charge for test@example.com",
-};
+  const cart = await cartModel.findById(cartId);
+  const user = await UserModel.findOne({ email: session.customer_email });
 
-const options = {
-  url: apiUrl,
-  method: "POST",
-  headers: {
-    Authorization: `Bearer ${apiKey}`,
-    "Content-Type": "application/x-www-form-urlencoded",
-  },
-  form: requestData,
-};
+  // Create order with default paymentMethodType card
+  const order = await orderModel.create({
+    user: user._id,
+    cartItems: cart.cartItems,
+    shippingAddress,
+    totalOrderPrice: oderPrice,
+    isPaid: true,
+    paidAt: Date.now(),
+    paymentMethodType: "card",
+  });
 
-request(options, (error, response, body) => {
-  if (error) {
-    console.error(error);
-  } else {
-    console.log(body);
+  // After creating order, decrement product quantity, increment product sold
+  if (order) {
+    const bulkOption = cart.cartItems.map((item) => ({
+      updateOne: {
+        filter: { _id: item.product },
+        update: { $inc: { quantity: -item.quantity, sold: +item.quantity } },
+      },
+    }));
+    await productModel.bulkWrite(bulkOption, {});
+
+    // Clear cart depend on cartId
+    await cartModel.findByIdAndDelete(cartId);
   }
-});
-
+};
+// @desc this webhook run when stripe payment is paid
+// @route POST webhook-checkout
+// @access private/user
 exports.webhookCheckout = asyncHandler(async (req, res, next) => {
   const sig = req.headers["stripe-signature"];
 
@@ -197,6 +206,8 @@ exports.webhookCheckout = asyncHandler(async (req, res, next) => {
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
   if (event.type === "checkout.session.completed") {
-    console.log("order created here...");
+    //  Create order
+    createCardOrder(event.data.object);
   }
+  res.status(200).json({ received: true });
 });
