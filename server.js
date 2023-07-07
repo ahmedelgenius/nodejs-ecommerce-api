@@ -1,12 +1,15 @@
 const path = require("path");
-
 const express = require("express");
 const compression = require("compression");
 const cors = require("cors");
+const morgan = require("morgan");
+const ApiError = require("./utils/apiError");
+const globalError = require("./middlewares/errorMiddleware");
+const mountRoute = require("./routes");
 
-const dotenv = require("dotenv");
+require("dotenv").config();
 
-dotenv.config({ path: "config.env" });
+const dbConnection = require("./config/database");
 
 const app = express();
 
@@ -22,13 +25,12 @@ app.use(express.json());
 
 app.use(express.static(path.join(__dirname, "uploads")));
 
-const morgan = require("morgan");
-const dbConnection = require("./config/database");
-const ApiError = require("./utils/apiError");
-const globalError = require("./middlewares/errorMiddleware");
-const mountRoute = require("./routes");
 //connection with database
-dbConnection();
+if (process.env.DB_URI && typeof process.env.DB_URI === "string") {
+  dbConnection();
+} else {
+  console.error("Invalid database URI");
+}
 
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
@@ -42,8 +44,10 @@ mountRoute(app);
 app.all("*", (req, res, next) => {
   next(new ApiError(`Can't find this route : ${req.originalUrl} `, 400));
 });
+
 // global error handling middleware
 app.use(globalError);
+
 const PORT = process.env.PORT || 8000;
 const server = app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
