@@ -3,6 +3,9 @@ const express = require("express");
 const compression = require("compression");
 const cors = require("cors");
 const morgan = require("morgan");
+const dotenv = require("dotenv");
+
+dotenv.config({ path: ".env" });
 // const stripe = require("stripe")(process.env.STRIPE_SECRET);
 
 const ApiError = require("./utils/apiError");
@@ -10,7 +13,7 @@ const globalError = require("./middlewares/errorMiddleware");
 const mountRoute = require("./routes");
 
 const { webhookCheckout } = require("./services/orderService");
-require("dotenv").config();
+// require("dotenv").config();
 
 const dbConnection = require("./config/database");
 
