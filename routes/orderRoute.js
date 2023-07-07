@@ -16,7 +16,7 @@ const router = express.Router();
 
 router.use(authService.protect);
 
-router.post(
+router.get(
   "/checkout-session/:cartId",
   authService.allowedTo("user"),
   checkoutSession
