@@ -4,7 +4,6 @@ const compression = require("compression");
 const cors = require("cors");
 const morgan = require("morgan");
 // const stripe = require("stripe")(process.env.STRIPE_SECRET);
-const bodyParser = require("body-parser");
 
 const ApiError = require("./utils/apiError");
 const globalError = require("./middlewares/errorMiddleware");
@@ -29,13 +28,6 @@ app.use(express.json());
 
 app.use(express.static(path.join(__dirname, "uploads")));
 
-app.use(
-  bodyParser.json({
-    verify: (req, res, buf) => {
-      req.rawBody = buf;
-    },
-  })
-);
 //connection with database
 if (process.env.DB_URI && typeof process.env.DB_URI === "string") {
   dbConnection();

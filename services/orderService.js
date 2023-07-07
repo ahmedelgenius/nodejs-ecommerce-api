@@ -197,18 +197,47 @@ const webhookForTest = "whsec_KbPNKfeg2JxS8LsUl7ReTpGqbJlRn1pq";
 // @route POST webhook-checkout
 // @access private/user
 exports.webhookCheckout = asyncHandler(async (req, res, next) => {
-  const sig = req.headers["stripe-signature"];
+  const payload = req.body;
+  const payloadString = JSON.stringify(payload, null, 2);
+  const header = stripe.webhooks.generateTestHeaderString({
+    payload: payloadString,
+    secret: webhookForTest,
+  });
 
-  let event;
-
-  try {
-    event = stripe.webhooks.constructEvent(req.body, sig, webhookForTest);
-  } catch (err) {
-    return res.status(400).send(`Webhook Error: ${err.message}`);
-  }
-  if (event.type === "checkout.session.completed") {
-    //  Create order
-    createCardOrder(event.data.object);
+  if (webhookForTest) {
+    let event;
+    try {
+      event = stripe.webhooks.constructEvent(
+        payloadString,
+        header,
+        webhookForTest
+      );
+      // data = event.data.oject;
+      // eventType = event.type;
+    } catch (err) {
+      return res.status(400).send(`Webhook Error: ${err.message}`);
+    }
+    if (event.type === "checkout.session.completed") {
+      console.log(event.type === "checkout.session.completed");
+      //  Create order
+      createCardOrder(event.data.object);
+    }
   }
   res.status(200).json({ received: true });
 });
+// exports.webhookCheckout = asyncHandler(async (req, res, next) => {
+//   const sig = req.headers["stripe-signature"];
+
+//   let event;
+
+//   try {
+//     event = stripe.webhooks.constructEvent(req.body, sig, webhookForTest);
+//   } catch (err) {
+//     return res.status(400).send(`Webhook Error: ${err.message}`);
+//   }
+//   if (event.type === "checkout.session.completed") {
+//     //  Create order
+//     createCardOrder(event.data.object);
+//   }
+//   res.status(200).json({ received: true });
+// });
