@@ -1,4 +1,5 @@
 const stripe = require("stripe")(process.env.STRIPE_SECRET);
+const request = require("request");
 
 const asyncHandler = require("express-async-handler");
 const Factory = require("./handlersFactory");
@@ -151,6 +152,34 @@ exports.checkoutSession = asyncHandler(async (req, res, next) => {
 
   // 4) send session to response
   res.status(200).json({ status: "success", session });
+});
+
+const apiKey = process.env.STRIPE_SECRET;
+const apiUrl = "https://api.stripe.com/v1/charges";
+
+const requestData = {
+  amount: 1000,
+  currency: "egp",
+  source: "tok_visa",
+  description: "Charge for test@example.com",
+};
+
+const options = {
+  url: apiUrl,
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${apiKey}`,
+    "Content-Type": "application/x-www-form-urlencoded",
+  },
+  form: requestData,
+};
+
+request(options, (error, response, body) => {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log(body);
+  }
 });
 
 exports.webhookCheckout = asyncHandler(async (req, res, next) => {
