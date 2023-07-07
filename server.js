@@ -10,6 +10,7 @@ const mountRoute = require("./routes");
 require("dotenv").config();
 
 const dbConnection = require("./config/database");
+const { webhookCheckout } = require("./services/orderService");
 
 const app = express();
 
@@ -38,6 +39,12 @@ if (process.env.NODE_ENV === "development") {
   console.log(`mode: ${process.env.NODE_ENV}`);
 }
 
+//
+app.post(
+  "/webhook-checkout",
+  express.raw({ type: "application/json" }),
+  webhookCheckout
+);
 // mount route
 mountRoute(app);
 
