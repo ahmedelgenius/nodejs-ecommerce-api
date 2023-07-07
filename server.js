@@ -3,7 +3,7 @@ const express = require("express");
 const compression = require("compression");
 const cors = require("cors");
 const morgan = require("morgan");
-const stripe = require("stripe")(process.env.STRIPE_SECRET);
+// const stripe = require("stripe")(process.env.STRIPE_SECRET);
 
 const ApiError = require("./utils/apiError");
 const globalError = require("./middlewares/errorMiddleware");

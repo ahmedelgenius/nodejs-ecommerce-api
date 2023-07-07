@@ -1,4 +1,7 @@
-const stripe = require("stripe")(process.env.STRIPE_SECRET);
+const stripe = require("stripe")(
+  "sk_test_51LYDjAHNiYvvzMMZbcLK39VZbLap6ctDLgUw73c4DokZBJ1dmJCW0ydFKpjiUTRT3bGe7a5uSl4iLvrHVqICIkPB008tcA3ms5"
+);
+// const stripe = require("stripe")(process.env.STRIPE_SECRET);
 const request = require("request");
 
 const asyncHandler = require("express-async-handler");
@@ -188,6 +191,8 @@ const createCardOrder = async (session) => {
     await cartModel.findByIdAndDelete(cartId);
   }
 };
+const webhookForTest = "whsec_KbPNKfeg2JxS8LsUl7ReTpGqbJlRn1pq";
+
 // @desc this webhook run when stripe payment is paid
 // @route POST webhook-checkout
 // @access private/user
@@ -197,11 +202,7 @@ exports.webhookCheckout = asyncHandler(async (req, res, next) => {
   let event;
 
   try {
-    event = stripe.webhooks.constructEvent(
-      req.body,
-      sig,
-      process.env.STRIPE_WEBHOOK_SECRET
-    );
+    event = stripe.webhooks.constructEvent(req.body, sig, webhookForTest);
   } catch (err) {
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
