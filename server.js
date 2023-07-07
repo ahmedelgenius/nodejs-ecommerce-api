@@ -7,10 +7,10 @@ const ApiError = require("./utils/apiError");
 const globalError = require("./middlewares/errorMiddleware");
 const mountRoute = require("./routes");
 
+const { webhookCheckout } = require("./services/orderService");
 require("dotenv").config();
 
 const dbConnection = require("./config/database");
-const { webhookCheckout } = require("./services/orderService");
 
 const app = express();
 
