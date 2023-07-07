@@ -1,8 +1,7 @@
-const stripe = require("stripe")(
-  "sk_test_51LYDjAHNiYvvzMMZbcLK39VZbLap6ctDLgUw73c4DokZBJ1dmJCW0ydFKpjiUTRT3bGe7a5uSl4iLvrHVqICIkPB008tcA3ms5"
-);
-// const stripe = require("stripe")(process.env.STRIPE_SECRET);
-const request = require("request");
+// const stripe = require("stripe")(
+//   "sk_test_51LYDjAHNiYvvzMMZbcLK39VZbLap6ctDLgUw73c4DokZBJ1dmJCW0ydFKpjiUTRT3bGe7a5uSl4iLvrHVqICIkPB008tcA3ms5"
+// );
+const stripe = require("stripe")(process.env.STRIPE_SECRET);
 
 const asyncHandler = require("express-async-handler");
 const Factory = require("./handlersFactory");
@@ -191,26 +190,27 @@ const createCardOrder = async (session) => {
     await cartModel.findByIdAndDelete(cartId);
   }
 };
-const webhookForTest = "whsec_KbPNKfeg2JxS8LsUl7ReTpGqbJlRn1pq";
+// const webhookForTest = "whsec_KbPNKfeg2JxS8LsUl7ReTpGqbJlRn1pq";
 
 // @desc this webhook run when stripe payment is paid
 // @route POST webhook-checkout
 // @access private/user
 exports.webhookCheckout = asyncHandler(async (req, res, next) => {
+  console.log(process.env.STRIPE_WEBHOOK_SECRET);
   const payload = req.body;
   const payloadString = JSON.stringify(payload, null, 2);
   const header = stripe.webhooks.generateTestHeaderString({
     payload: payloadString,
-    secret: webhookForTest,
+    secret: process.env.STRIPE_WEBHOOK_SECRET,
   });
 
-  if (webhookForTest) {
+  if (process.env.STRIPE_WEBHOOK_SECRET) {
     let event;
     try {
       event = stripe.webhooks.constructEvent(
         payloadString,
         header,
-        webhookForTest
+        process.env.STRIPE_WEBHOOK_SECRET
       );
       // data = event.data.oject;
       // eventType = event.type;
@@ -225,19 +225,3 @@ exports.webhookCheckout = asyncHandler(async (req, res, next) => {
   }
   res.status(200).json({ received: true });
 });
-// exports.webhookCheckout = asyncHandler(async (req, res, next) => {
-//   const sig = req.headers["stripe-signature"];
-
-//   let event;
-
-//   try {
-//     event = stripe.webhooks.constructEvent(req.body, sig, webhookForTest);
-//   } catch (err) {
-//     return res.status(400).send(`Webhook Error: ${err.message}`);
-//   }
-//   if (event.type === "checkout.session.completed") {
-//     //  Create order
-//     createCardOrder(event.data.object);
-//   }
-//   res.status(200).json({ received: true });
-// });
