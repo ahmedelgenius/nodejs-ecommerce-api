@@ -20,31 +20,28 @@ const router = express.Router();
 const authService = require("../services/authService");
 
 router.use("/:productId/reviews", reviewRoute);
-router
-  .route("/")
-  .get(getProducts)
-  .post(
-    authService.protect,
-    authService.allowedTo("manager", "admin"),
-    uploadProductImages,
-    resizeProductImage,
-    createProductValidator,
-    createProduct
-  );
+router.route("/").get(getProducts).post(
+  // authService.protect,
+  // authService.allowedTo("manager", "admin"),
+  uploadProductImages,
+  resizeProductImage,
+  createProductValidator,
+  createProduct
+);
 router
   .route("/:id")
   .get(getProductValidator, getProduct)
   .put(
-    authService.protect,
-    authService.allowedTo("manager", "admin"),
+    // authService.protect,
+    // authService.allowedTo("manager", "admin"),
     uploadProductImages,
     resizeProductImage,
     updateProductValidator,
     updateProduct
   )
   .delete(
-    authService.protect,
-    authService.allowedTo("admin"),
+    // authService.protect,
+    // authService.allowedTo("admin"),
     deleteProductValidator,
     deleteProduct
   );
