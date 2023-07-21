@@ -6,7 +6,7 @@ exports.createOne = (Model) =>
   asyncHandler(async (req, res) => {
     console.log(req.body);
     const document = await Model.create(req.body);
-    res.status(201).json({ data: document });
+    res.status(201).json({ status: 201, data: document });
   });
 exports.getAll = (Model, modelName = "") =>
   asyncHandler(async (req, res) => {
