@@ -23,7 +23,7 @@ exports.signup = asyncHandler(async (req, res, next) => {
   });
   //  generate token
   const token = createToken(user._id);
-  res.status(201).json({ Data: user, token });
+  res.status(201).json({ data: user, token });
 });
 // @desc login
 // @route POST /api/v1/auth/login
@@ -42,7 +42,7 @@ exports.login = asyncHandler(async (req, res, next) => {
 
   const token = createToken(user._id);
   console.log(token);
-  res.status(201).json({ Data: user, token });
+  res.status(201).json({ data: user, token });
 });
 
 exports.protect = asyncHandler(async (req, res, next) => {
@@ -209,5 +209,5 @@ exports.resetPassword = asyncHandler(async (req, res, next) => {
 
   const token = createToken(user._id);
 
-  res.status(200).json(token);
+  res.status(200).json({ status: "success", token });
 });

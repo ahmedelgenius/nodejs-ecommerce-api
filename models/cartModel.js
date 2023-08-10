@@ -22,6 +22,7 @@ const cartSchema = new mongoose.Schema(
       type: mongoose.Schema.ObjectId,
       ref: "User",
     },
+    coupon: String,
   },
   { timestamps: true }
 );

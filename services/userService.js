@@ -137,7 +137,7 @@ exports.updateLoggedUserData = asyncHandler(async (req, res, next) => {
     { new: true }
   );
 
-  res.status(200).json({ data: updatedUser });
+  res.status(200).json({ status: "success", data: updatedUser });
 });
 // @desc deactivate user
 // @route PUT /api/v1/users/deleteMe

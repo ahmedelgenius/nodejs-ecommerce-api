@@ -9,14 +9,10 @@ exports.createProductValidator = [
     .isLength({ min: 3 })
     .withMessage("must be at least 3 chars")
     .notEmpty()
-    .withMessage("Product required")
+    .withMessage("Product title is required")
     .custom((val, { req }) => {
       req.body.slug = slugify(val);
-      return true;
-    })
-    .optional()
-    .custom((val, { req }) => {
-      req.body.slug = slugify(val);
+
       return true;
     }),
   check("titleAr")
@@ -151,6 +147,7 @@ exports.updateProductValidator = [
       req.body.slug = slugify(val);
       return true;
     }),
+  check("imageCover").optional(),
   validatorMiddleware,
 ];
 

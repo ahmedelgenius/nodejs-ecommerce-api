@@ -26,10 +26,11 @@ exports.addProductToWishlist = asyncHandler(async (req, res, next) => {
 // @route DELETE /api/v1/wishlist
 // @access protect/user
 exports.removeProductFromWishlist = asyncHandler(async (req, res, next) => {
+  const { productId } = req.params;
   const user = await UserModel.findByIdAndUpdate(
     req.user._id,
     {
-      $pull: { wishlist: req.params.productId },
+      $pull: { wishlist: productId },
     },
     { new: true }
   );

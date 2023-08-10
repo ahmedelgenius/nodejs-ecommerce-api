@@ -5,30 +5,36 @@ const ApiFeatures = require("../utils/apiFeatures");
 exports.createOne = (Model) =>
   asyncHandler(async (req, res) => {
     console.log(req.body);
+    console.log("create is here");
     const document = await Model.create(req.body);
     res.status(201).json({ status: 201, data: document });
   });
+
 exports.getAll = (Model, modelName = "") =>
   asyncHandler(async (req, res) => {
     let filter = {};
     if (req.filterObj) {
       filter = req.filterObj;
     }
-    const documentsCounts = await Model.countDocuments();
+
     // build query
     const apiFeatures = new ApiFeatures(Model.find(filter), req.query)
-      .paginate(documentsCounts)
+
       .filter()
       .search(modelName)
       .limitFields()
       .sort();
 
+    const documentsCounts = await Model.countDocuments(
+      apiFeatures.mongooseQuery
+    );
+    apiFeatures.paginate(documentsCounts);
     // execute query
     const { mongooseQuery, paginationResult } = apiFeatures;
     const documents = await mongooseQuery;
 
     res.status(201).json({
-      results: documents.length,
+      results: documentsCounts,
       paginationResult,
       data: documents,
     });

@@ -27,8 +27,8 @@ router
   .route("/")
   .get(getCategories)
   .post(
-    // authService.protect,
-    // authService.allowedTo("manager", "admin"),
+    authService.protect,
+    authService.allowedTo("manager", "admin"),
     uploadCategoryImage,
     resizeImage,
     createCategoryValidator,
@@ -38,16 +38,16 @@ router
   .route("/:id")
   .get(getCategoryValidator, getCategory)
   .put(
-    // authService.protect,
-    // authService.allowedTo("manager", "admin"),
+    authService.protect,
+    authService.allowedTo("manager", "admin"),
     uploadCategoryImage,
     resizeImage,
     updateCategoryValidator,
     updateCategory
   )
   .delete(
-    // authService.protect,
-    // authService.allowedTo("admin"),
+    authService.protect,
+    authService.allowedTo("admin"),
     deleteCategoryValidator,
     deleteCategory
   );

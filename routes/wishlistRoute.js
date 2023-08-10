@@ -14,7 +14,7 @@ router.use(authService.protect, authService.allowedTo("user"));
 router.route("/").post(addProductToWishlist).get(getLoggedUserWishlist);
 
 router.delete(
-  "/:id",
+  "/:productId",
 
   removeProductFromWishlist
 );
