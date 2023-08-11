@@ -136,7 +136,7 @@ exports.checkoutSession = asyncHandler(async (req, res, next) => {
     line_items: [
       {
         price_data: {
-          currency: "egp",
+          currency: "usd",
           product_data: {
             name: req.user.name,
           },
@@ -146,8 +146,10 @@ exports.checkoutSession = asyncHandler(async (req, res, next) => {
       },
     ],
     mode: "payment",
-    success_url: `${req.protocol}://${req.get("host")}/user/allorders`,
-    cancel_url: `${req.protocol}://${req.get("host")}/cart`,
+    // success_url: `${req.protocol}://${req.get("host")}/user/allorders`,
+    // cancel_url: `${req.protocol}://${req.get("host")}/cart`,
+    success_url: `https://t-shop-api-v1.onrender.com/user/allorders`,
+    cancel_url: `https://t-shop-api-v1.onrender.com/cart`,
     customer_email: req.user.email,
     client_reference_id: req.params.cartId,
     metadata: req.body.shippingAddress,
