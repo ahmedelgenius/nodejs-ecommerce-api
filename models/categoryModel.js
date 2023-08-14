@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { cloudinaryUploadImage } = require("../utils/cloudinary");
 
 const categorySchema = new mongoose.Schema(
   {
@@ -20,21 +21,34 @@ const categorySchema = new mongoose.Schema(
       type: String,
       lowercase: true,
     },
-    image: String,
+    image: {
+      public_id: String,
+      url: String,
+    },
+    // image: String,
   },
   { timestamps: true }
 );
 
-const setImageURL = (doc) => {
+const setImageURL = async (doc) => {
   const imageURL = `${process.env.BASE_URL}/categories/${doc.image}`;
-  doc.image = imageURL;
+  const result = await cloudinaryUploadImage(imageURL);
+  console.log(result);
+  doc.image = result;
 };
-categorySchema.post("init", (doc) => {
-  setImageURL(doc);
-});
-categorySchema.post("save", (doc) => {
-  setImageURL(doc);
-});
+// const setImageURL = async (doc) => {
+//   const imageURL = `${process.env.BASE_URL}/categories/${doc.image}`;
+
+//   console.log(myCloud);
+//   doc.image.public_id = myCloud.public_id;
+//   doc.image.url = myCloud.secure_url;
+// };
+// categorySchema.post("init", (doc) => {
+//   setImageURL(doc);
+// });
+// categorySchema.post("save", (doc) => {
+//   setImageURL(doc);
+// });
 const CategoryModel = mongoose.model("Category", categorySchema);
 
 module.exports = CategoryModel;

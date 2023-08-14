@@ -20,20 +20,24 @@ const brandSchema = new mongoose.Schema(
       type: String,
       lowercase: true,
     },
-    image: String,
+    image: {
+      public_id: String,
+      url: String,
+    },
+    // image: String,
   },
   { timestamps: true }
 );
-const setImageURL = (doc) => {
-  const imageURL = `${process.env.BASE_URL}/brands/${doc.image}`;
-  doc.image = imageURL;
-};
-brandSchema.post("init", (doc) => {
-  setImageURL(doc);
-});
-brandSchema.post("save", (doc) => {
-  setImageURL(doc);
-});
+// const setImageURL = (doc) => {
+//   const imageURL = `${process.env.BASE_URL}/brands/${doc.image}`;
+//   doc.image = imageURL;
+// };
+// brandSchema.post("init", (doc) => {
+//   setImageURL(doc);
+// });
+// brandSchema.post("save", (doc) => {
+//   setImageURL(doc);
+// });
 const BrandModel = mongoose.model("Brand", brandSchema);
 
 module.exports = BrandModel;

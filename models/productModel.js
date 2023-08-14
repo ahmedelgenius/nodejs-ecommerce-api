@@ -53,10 +53,15 @@ const productSchema = new mongoose.Schema(
     },
     colors: [String],
     imageCover: {
-      type: String,
-      required: [true, "product image cover is required"],
+      public_id: String,
+      url: String,
     },
-    images: [String],
+    images: [
+      {
+        public_id: String,
+        url: String,
+      },
+    ],
     category: {
       type: mongoose.Schema.ObjectId,
       ref: "Category",
@@ -90,40 +95,46 @@ const productSchema = new mongoose.Schema(
 );
 // mongoose query middleware
 productSchema.pre(/^find/, function (next) {
-  this.populate({
-    path: "category",
-    select: "name",
-  });
+  this.populate([
+    {
+      path: "category",
+      select: "name",
+    },
+    {
+      path: "brand",
+      select: "name",
+    },
+  ]);
   next();
 });
 
-const setImageURL = (doc) => {
-  if (doc.imageCover) {
-    const imageURL = `${process.env.BASE_URL}/products/${doc.imageCover}`;
-    doc.imageCover = imageURL;
-  }
-  if (doc.images) {
-    const imagesList = [];
-    doc.images.forEach((image) => {
-      const imageURL = `${process.env.BASE_URL}/products/${image}`;
-      imagesList.push(imageURL);
-    });
+// const setImageURL = (doc) => {
+//   if (doc.imageCover) {
+//     const imageURL = `${process.env.BASE_URL}/products/${doc.imageCover}`;
+//     doc.imageCover = imageURL;
+//   }
+//   if (doc.images) {
+//     const imagesList = [];
+//     doc.images.forEach((image) => {
+//       const imageURL = `${process.env.BASE_URL}/products/${image}`;
+//       imagesList.push(imageURL);
+//     });
 
-    doc.images = imagesList;
-  }
-};
+//     doc.images = imagesList;
+//   }
+// };
 
 productSchema.virtual("reviews", {
   ref: "Review",
   foreignField: "product",
   localField: "_id",
 });
-productSchema.post("init", (doc) => {
-  setImageURL(doc);
-});
-productSchema.post("save", (doc) => {
-  setImageURL(doc);
-});
+// productSchema.post("init", (doc) => {
+//   setImageURL(doc);
+// });
+// productSchema.post("save", (doc) => {
+//   setImageURL(doc);
+// });
 
 const productModel = mongoose.model("Product", productSchema);
 

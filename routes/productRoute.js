@@ -20,17 +20,14 @@ const router = express.Router();
 const authService = require("../services/authService");
 
 router.use("/:productId/reviews", reviewRoute);
-router
-  .route("/")
-  .get(getProducts)
-  .post(
-    authService.protect,
-    authService.allowedTo("manager", "admin"),
-    uploadProductImages,
-    resizeProductImage,
-    createProductValidator,
-    createProduct
-  );
+router.route("/").get(getProducts).post(
+  authService.protect,
+  authService.allowedTo("manager", "admin"),
+  uploadProductImages,
+  // resizeProductImage,
+  createProductValidator,
+  createProduct
+);
 router
   .route("/:id")
   .get(getProductValidator, getProduct)
@@ -38,7 +35,7 @@ router
     authService.protect,
     authService.allowedTo("manager", "admin"),
     uploadProductImages,
-    resizeProductImage,
+    // resizeProductImage,
     updateProductValidator,
     updateProduct
   )

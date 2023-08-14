@@ -6,6 +6,7 @@ const morgan = require("morgan");
 const dotenv = require("dotenv");
 
 dotenv.config({ path: ".env" });
+
 // const stripe = require("stripe")(process.env.STRIPE_SECRET);
 
 const ApiError = require("./utils/apiError");

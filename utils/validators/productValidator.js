@@ -9,21 +9,21 @@ exports.createProductValidator = [
     .isLength({ min: 3 })
     .withMessage("must be at least 3 chars")
     .notEmpty()
-    .withMessage("Product title is required")
-    .custom((val, { req }) => {
-      req.body.slug = slugify(val);
+    .withMessage("Product title is required"),
+  // .custom((val, { req }) => {
+  //   req.body.slug = slugify(val);
 
-      return true;
-    }),
+  //   return true;
+  // })
   check("titleAr")
     .isLength({ min: 3 })
     .withMessage("يجب ان يكون علي الاقل 3 حروف")
     .notEmpty()
-    .withMessage("اسم المنتج مطلوب")
-    .custom((val, { req }) => {
-      req.body.slug = slugify(val);
-      return true;
-    }),
+    .withMessage("اسم المنتج مطلوب"),
+  // .custom((val, { req }) => {
+  //   req.body.slug = slugify(val);
+  //   return true;
+  // })
   check("description")
     .notEmpty()
     .withMessage("Product description is required")
@@ -66,7 +66,7 @@ exports.createProductValidator = [
     .optional()
     .isArray()
     .withMessage("colors should be array of string"),
-  check("imageCover").notEmpty().withMessage("Product imageCover is required"),
+  check("imageCover").optional(),
   check("images")
     .optional()
     .isArray()
